@@ -18,10 +18,10 @@ class JaneConfig:
     HOST: str = "localhost"
     PORT: int = 8765
 
-    # LLM Settings — LOCAL OLLAMA (FREE)
+    # LLM Settings — LOCAL OLLAMA (FREE, UNCENSORED)
     LLM_PROVIDER: str = "ollama"
     OLLAMA_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama3.1"
+    OLLAMA_MODEL: str = "dolphin-llama3"
 
     # Voice Settings — FREE EDGE-TTS
     TTS_PROVIDER: str = "edge_tts"
@@ -48,7 +48,7 @@ class JaneConfig:
     def from_env(cls):
         return cls(
             USER_NAME=os.getenv("JANE_USER_NAME", "Fhish"),
-            OLLAMA_MODEL=os.getenv("JANE_OLLAMA_MODEL", "llama3.1"),
+            OLLAMA_MODEL=os.getenv("JANE_OLLAMA_MODEL", "dolphin-llama3"),
             EDGE_TTS_VOICE=os.getenv("JANE_VOICE", "en-US-AnaNeural"),
         )
 

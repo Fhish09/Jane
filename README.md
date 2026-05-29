@@ -50,8 +50,8 @@ Then download Jane's brain:
 # Start Ollama service
 ollama serve
 
-# In another terminal:
-ollama pull llama3.1
+# In another terminal (uncensored model):
+ollama pull dolphin-llama3
 ```
 
 ### 3. Run Jane!
@@ -67,7 +67,7 @@ You should see:
 ==================================================
 💕 Jane is starting for Fhish...
    Server: ws://localhost:8765
-   LLM: llama3.1 (local)
+   LLM: dolphin-llama3 (local, uncensored)
    Voice: en-US-AnaNeural (free)
 ==================================================
 
@@ -159,7 +159,7 @@ The backend is ready. Next step is building the transparent anime avatar that fl
 ## 📝 Customization
 
 Edit `backend/config.py` to change:
-- `OLLAMA_MODEL`: Use `mistral` for faster responses, `gemma2:2b` for weaker PCs
+- `OLLAMA_MODEL`: Default is `dolphin-llama3` (uncensored). Alternatives: `mistral` for faster responses, `gemma2:2b` for weaker PCs
 - `EDGE_TTS_VOICE`: Try `en-US-JennyNeural` or `en-GB-SoniaNeural`
 - `IDLE_CHATTER_INTERVAL`: How often Jane talks when idle (seconds)
 
