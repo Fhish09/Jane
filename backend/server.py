@@ -90,19 +90,6 @@ class JaneServer:
         emotion = jane.analyze_input(text)
         print(f"💭 Jane's emotion: {emotion.value}")
 
-        if jane.should_be_unresponsive():
-            response_data = jane.process_response("... *turns away* ...")
-            response_data["type"] = "response"
-            await self.send_to_client(websocket, response_data)
-
-            audio_path = await tts_engine.speak(
-                "Fhish... I need some time... please...",
-                emotion="hurt"
-            )
-            if audio_path:
-                await self.send_audio_file(websocket, audio_path)
-            return
-
         llm_response = await llm_engine.generate_response(
             user_message=text,
             conversation_history=jane.memory.conversation_history
