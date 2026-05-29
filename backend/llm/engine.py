@@ -63,7 +63,7 @@ class LLMEngine:
                         "repeat_penalty": 1.1,
                     }
                 },
-                timeout=60
+                timeout=120
             )
 
             if stream:

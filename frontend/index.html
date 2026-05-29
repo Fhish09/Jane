@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jane 💕</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e0e0;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #header {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        #avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d, #c44dff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        #header-info h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ff9ec6;
+        }
+
+        #status {
+            font-size: 12px;
+            color: #888;
+        }
+
+        #status.online { color: #4caf50; }
+        #status.offline { color: #f44336; }
+
+        #emotion-badge {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            background: rgba(255, 155, 200, 0.15);
+            color: #ff9ec6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .message {
+            max-width: 82%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.jane {
+            align-self: flex-start;
+            background: rgba(255, 155, 200, 0.12);
+            border: 1px solid rgba(255, 155, 200, 0.2);
+            border-bottom-left-radius: 4px;
+            color: #f0d0e0;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: rgba(100, 140, 255, 0.2);
+            border: 1px solid rgba(100, 140, 255, 0.3);
+            border-bottom-right-radius: 4px;
+            color: #d0d8ff;
+        }
+
+        .message.system {
+            align-self: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: #888;
+            font-size: 13px;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .message .emotion-tag {
+            display: inline-block;
+            font-size: 11px;
+            color: #ff9ec6;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+
+        .typing-indicator {
+            align-self: flex-start;
+            padding: 12px 18px;
+            background: rgba(255, 155, 200, 0.08);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            display: none;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff9ec6;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        #input-area {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: #e0e0e0;
+            font-size: 15px;
+            outline: none;
+            resize: none;
+            max-height: 100px;
+            line-height: 1.4;
+            font-family: inherit;
+        }
+
+        #message-input:focus {
+            border-color: rgba(255, 155, 200, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #message-input::placeholder { color: #666; }
+
+        #send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff6b9d, #c44dff);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.15s, opacity 0.15s;
+        }
+
+        #send-btn:active { transform: scale(0.9); }
+        #send-btn:disabled { opacity: 0.4; }
+
+        #audio-player { display: none; }
+
+        #reconnect-bar {
+            display: none;
+            padding: 8px;
+            background: rgba(244, 67, 54, 0.2);
+            text-align: center;
+            font-size: 13px;
+            color: #f44336;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="reconnect-bar" onclick="connectWS()">Connection lost. Tap to reconnect.</div>
+
+    <div id="header">
+        <div id="avatar">🌸</div>
+        <div id="header-info">
+            <h1>Jane</h1>
+            <div id="status" class="offline">Connecting...</div>
+        </div>
+        <div id="emotion-badge">calm</div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="typing-indicator" id="typing">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div id="input-area">
+        <textarea id="message-input" placeholder="Talk to Jane..." rows="1"></textarea>
+        <button id="send-btn" onclick="sendMessage()">&#9654;</button>
+    </div>
+
+    <audio id="audio-player"></audio>
+
+    <script>
+        const messagesEl = document.getElementById('messages');
+        const inputEl = document.getElementById('message-input');
+        const statusEl = document.getElementById('status');
+        const emotionEl = document.getElementById('emotion-badge');
+        const typingEl = document.getElementById('typing');
+        const reconnectBar = document.getElementById('reconnect-bar');
+        const audioPlayer = document.getElementById('audio-player');
+        const sendBtn = document.getElementById('send-btn');
+
+        let ws = null;
+        let isWaiting = false;
+
+        function getWSUrl() {
+            const host = window.location.hostname || 'localhost';
+            const port = 8765;
+            return `ws://${host}:${port}`;
+        }
+
+        function connectWS() {
+            if (ws && ws.readyState === WebSocket.OPEN) return;
+
+            statusEl.textContent = 'Connecting...';
+            statusEl.className = 'offline';
+            reconnectBar.style.display = 'none';
+
+            try {
+                ws = new WebSocket(getWSUrl());
+            } catch (e) {
+                statusEl.textContent = 'Connection failed';
+                reconnectBar.style.display = 'block';
+                return;
+            }
+
+            ws.onopen = () => {
+                statusEl.textContent = 'Online';
+                statusEl.className = 'online';
+                reconnectBar.style.display = 'none';
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            };
+
+            ws.onclose = () => {
+                statusEl.textContent = 'Offline';
+                statusEl.className = 'offline';
+                reconnectBar.style.display = 'block';
+                isWaiting = false;
+                setTyping(false);
+            };
+
+            ws.onerror = () => {
+                statusEl.textContent = 'Error';
+                statusEl.className = 'offline';
+            };
+        }
+
+        function handleMessage(data) {
+            switch (data.type) {
+                case 'welcome':
+                    addMessage(data.message, 'jane');
+                    break;
+
+                case 'response':
+                    setTyping(false);
+                    isWaiting = false;
+                    if (data.emotion) {
+                        emotionEl.textContent = data.emotion;
+                    }
+                    addMessage(data.text, 'jane', data.emotion);
+                    break;
+
+                case 'idle_chatter':
+                    if (data.emotion) {
+                        emotionEl.textContent = data.emotion;
+                    }
+                    addMessage(data.text, 'jane', data.emotion);
+                    break;
+
+                case 'audio':
+                    playAudio(data.audio_data, data.format);
+                    break;
+
+                case 'command_result':
+                    setTyping(false);
+                    isWaiting = false;
+                    addMessage(data.text, 'jane');
+                    break;
+
+                case 'error':
+                    setTyping(false);
+                    isWaiting = false;
+                    addMessage(data.message, 'system');
+                    break;
+
+                case 'pong':
+                    break;
+
+                case 'transcription':
+                    addMessage(`(You said: ${data.text})`, 'system');
+                    break;
+            }
+        }
+
+        function addMessage(text, sender, emotion) {
+            const msgEl = document.createElement('div');
+            msgEl.className = `message ${sender}`;
+
+            if (sender === 'jane' && emotion) {
+                const tag = document.createElement('div');
+                tag.className = 'emotion-tag';
+                tag.textContent = emotion;
+                msgEl.appendChild(tag);
+            }
+
+            const textNode = document.createElement('div');
+            textNode.textContent = text;
+            msgEl.appendChild(textNode);
+
+            messagesEl.appendChild(msgEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function setTyping(show) {
+            typingEl.style.display = show ? 'block' : 'none';
+            if (show) {
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+        }
+
+        function playAudio(base64Data, format) {
+            try {
+                const blob = new Blob(
+                    [Uint8Array.from(atob(base64Data), c => c.charCodeAt(0))],
+                    { type: `audio/${format || 'mp3'}` }
+                );
+                audioPlayer.src = URL.createObjectURL(blob);
+                audioPlayer.play().catch(() => {});
+            } catch (e) {
+                console.error('Audio playback error:', e);
+            }
+        }
+
+        function sendMessage() {
+            const text = inputEl.value.trim();
+            if (!text || !ws || ws.readyState !== WebSocket.OPEN || isWaiting) return;
+
+            addMessage(text, 'user');
+            ws.send(JSON.stringify({ type: 'text', content: text }));
+
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+            isWaiting = true;
+            setTyping(true);
+        }
+
+        // Auto-resize textarea
+        inputEl.addEventListener('input', () => {
+            inputEl.style.height = 'auto';
+            inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
+        });
+
+        // Enter to send, Shift+Enter for newline
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Connect on load
+        connectWS();
+    </script>
+</body>
+</html>

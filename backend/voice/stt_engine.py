@@ -2,8 +2,6 @@
 Speech-to-Text Engine using OpenAI Whisper (local, free)
 """
 
-import whisper
-import numpy as np
 import tempfile
 import os
 from typing import Optional
@@ -14,6 +12,7 @@ class STTEngine:
     """Local speech recognition using Whisper. Completely free!"""
 
     def __init__(self):
+        import whisper
         self.model_name = config.WHISPER_MODEL
         print(f"🎤 Loading Whisper model: {self.model_name}...")
         self.model = whisper.load_model(self.model_name)

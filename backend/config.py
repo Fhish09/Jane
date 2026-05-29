@@ -15,8 +15,9 @@ class JaneConfig:
     """Central configuration for Jane"""
 
     # Server settings
-    HOST: str = "localhost"
+    HOST: str = "0.0.0.0"
     PORT: int = 8765
+    WEB_PORT: int = 8766
 
     # LLM Settings — LOCAL OLLAMA (FREE, UNCENSORED)
     LLM_PROVIDER: str = "ollama"
