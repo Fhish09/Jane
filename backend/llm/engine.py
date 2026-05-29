@@ -57,12 +57,13 @@ class LLMEngine:
                     "messages": messages,
                     "stream": stream,
                     "options": {
-                        "temperature": 0.8,
-                        "num_predict": 250,
-                        "top_p": 0.9,
+                        "temperature": 0.9,
+                        "num_predict": 500,
+                        "top_p": 0.95,
+                        "repeat_penalty": 1.1,
                     }
                 },
-                timeout=60
+                timeout=120
             )
 
             if stream:

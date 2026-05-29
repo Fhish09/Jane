@@ -1,6 +1,7 @@
 """
-Jane WebSocket Server
+Jane WebSocket Server + Web UI
 Real-time communication hub for Jane's voice, personality, and device control
+Serves a mobile-friendly web interface for chatting with Jane from any device.
 """
 
 import asyncio
@@ -8,8 +9,10 @@ import json
 import os
 import time
 import base64
+import socket
 from datetime import datetime
 from typing import Dict, Set
+from http.server import SimpleHTTPRequestHandler
 import websockets
 from websockets.server import WebSocketServerProtocol
 
@@ -89,19 +92,6 @@ class JaneServer:
 
         emotion = jane.analyze_input(text)
         print(f"💭 Jane's emotion: {emotion.value}")
-
-        if jane.should_be_unresponsive():
-            response_data = jane.process_response("... *turns away* ...")
-            response_data["type"] = "response"
-            await self.send_to_client(websocket, response_data)
-
-            audio_path = await tts_engine.speak(
-                "Fhish... I need some time... please...",
-                emotion="hurt"
-            )
-            if audio_path:
-                await self.send_audio_file(websocket, audio_path)
-            return
 
         llm_response = await llm_engine.generate_response(
             user_message=text,
@@ -351,24 +341,57 @@ class JaneServer:
 
                 print(f"💭 Idle chatter: {message}")
 
-    async def start(self, host: str = "localhost", port: int = 8765):
+    async def start(self, host: str = "0.0.0.0", port: int = 8765):
         self.is_running = True
+
+        local_ip = self._get_local_ip()
+        web_port = port + 1
 
         print(f"\n{'='*50}")
         print(f"💕 Jane is starting for Fhish...")
-        print(f"   Server: ws://{host}:{port}")
+        print(f"   WebSocket: ws://{local_ip}:{port}")
+        print(f"   Web UI:    http://{local_ip}:{web_port}")
         print(f"   LLM: {config.OLLAMA_MODEL} (local)")
         print(f"   Voice: {config.EDGE_TTS_VOICE} (free)")
         print(f"{'='*50}\n")
 
         asyncio.create_task(self.idle_chatter_loop())
+        asyncio.create_task(self._serve_web_ui(host, web_port))
 
         async with websockets.serve(self.handle_client, host, port):
-            print("✅ Jane is online and waiting for Fhish... 💕")
-            print("   Open your Electron app to connect!")
+            print(f"✅ Jane is online and waiting for Fhish... 💕")
+            print(f"   Open http://{local_ip}:{web_port} on your phone!")
 
             while self.is_running:
                 await asyncio.sleep(1)
+
+    async def _serve_web_ui(self, host: str, port: int):
+        """Serve the mobile web frontend."""
+        frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+
+        class Handler(SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=frontend_dir, **kwargs)
+
+            def log_message(self, format, *args):
+                pass
+
+        loop = asyncio.get_event_loop()
+        from http.server import HTTPServer
+        server = HTTPServer((host, port), Handler)
+        await loop.run_in_executor(None, server.serve_forever)
+
+    @staticmethod
+    def _get_local_ip() -> str:
+        """Get the local network IP address."""
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except Exception:
+            return "localhost"
 
     def stop(self):
         self.is_running = False
